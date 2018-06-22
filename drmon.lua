@@ -187,6 +187,7 @@ function update()
         print(k.. ": ".. tostring(v))
       else
         print(k.. ": ".. v)
+      end
     end
     print("Output Gate: ", outflux.getSignalLowFlow())
     print("Input Gate: ", influx.getSignalLowFlow())
