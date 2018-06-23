@@ -1,8 +1,9 @@
 -- modifiable variables
 local reactorSide = "back"
-local modem = "bottom"
-local igateName = ""
-local ogateName = ""
+-- Names are displayed when you turn on the modem
+local igateName = "flux_gate_3"
+local ogateName = "flux_gate_2"
+local monName = "monitor_0"
 
 local targetStrength = 50
 local maxTemperature = 8000
@@ -17,6 +18,7 @@ os.loadAPI("lib/f")
 local version = "0.30"
 -- toggleable via the monitor, use our algorithm to achieve our target field strength or let the user tweak it
 local autoInputGate = 1
+local oFlow = 0
 local iFlow = 222000
 
 -- monitor 
@@ -35,9 +37,9 @@ local action = "None since reboot"
 local emergencyCharge = false
 local emergencyTemp = false
 
-monitor = f.periphSearch("monitor")
-influx = f.periphSearch(igateName)
-outflux = f.periphSearch(ogateName)
+monitor = peripheral.wrap(monName)
+influx = peripheral.wrap(igateName)
+outflux = peripheral.wrap(ogateName)
 reactor = peripheral.wrap(reactorSide)
 
 if monitor == null then
@@ -93,6 +95,7 @@ end
 function buttons()
 
   while true do
+    update()
     -- button handler
     event, side, xPos, yPos = os.pullEvent("monitor_touch")
 
@@ -149,7 +152,7 @@ function buttons()
       end
       save_config()
     end
-
+    update()
   end
 end
 
@@ -326,5 +329,5 @@ function update()
   end
 end
 
-parallel.waitForAny(buttons, update)
+parallel.waitForAny(update, buttons)
 
