@@ -54,13 +54,3 @@ function progress_bar(mon, x, y, length, minVal, maxVal, bar_color, bg_color)
   local barSize = math.floor((minVal/maxVal) * length)
   draw_line(mon, x, y, barSize, bar_color) --progress so far
 end
-
-
-function clear(mon)
-  term.clear()
-  term.setCursorPos(1,1)
-  mon.monitor.setBackgroundColor(colors.black)
-  mon.monitor.clear()
-  mon.monitor.setCursorPos(1,1)
-end
-
