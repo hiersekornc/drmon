@@ -88,14 +88,13 @@ if fs.exists("config.txt") == false then
   save_config()
 else
   load_config()
-  outflux.setSignalLowFlow(oFlow)
   influx.setSignalLowFlow(iFlow)
+  outflux.setSignalLowFlow(oFlow)
 end
 
 function buttons()
 
   while true do
-    update()
     -- button handler
     event, side, xPos, yPos = os.pullEvent("monitor_touch")
 
@@ -152,7 +151,6 @@ function buttons()
       end
       save_config()
     end
-    update()
   end
 end
 
