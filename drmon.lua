@@ -210,8 +210,9 @@ function update()
       statusColor = colors.orange
     end
 
+    genrate = tostring(format_int(ri.generationRate))
     f.draw_text_lr(mon, 2, 2, 1, "Reactor Status", pad(string.upper(ri.status),12," "), colors.white, statusColor, colors.black)
-    f.draw_text_lr(mon, 2, 4, 1, "Generation", pad(tostring(format_int(ri.generationRate)), 11, " ") .. " rf/t", colors.white, colors.lime, colors.black)
+    f.draw_text_lr(mon, 2, 4, 1, "Generation", pad(genrate, 10, " ") .. " rf/t", colors.white, colors.lime, colors.black)
 
     local tempColor = colors.red
     if ri.temperature <= 5000 then tempColor = colors.green end
