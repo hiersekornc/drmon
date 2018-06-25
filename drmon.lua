@@ -170,7 +170,7 @@ end
 
 function pad(str, len, char)
     if char == nil then char = ' ' end
-    return str .. string.rep(char, len - #str)
+    return string.rep(char, len - #str) .. str
 end
 
 function update()
