@@ -210,11 +210,8 @@ function update()
       statusColor = colors.orange
     end
 
-    ri.status = pad(ri.status, 12, " ")
-    genrate = pad(tostring(ri.generationRate), 11, " ")
-
-    f.draw_text_lr(mon, 2, 2, 1, "Reactor Status", string.upper(ri.status), colors.white, statusColor, colors.black)
-    f.draw_text_lr(mon, 2, 4, 1, "Generation", genrate .. " rf/t", colors.white, colors.lime, colors.black)
+    f.draw_text_lr(mon, 2, 2, 1, "Reactor Status", pad(string.upper(ri.status),12," "), colors.white, statusColor, colors.black)
+    f.draw_text_lr(mon, 2, 4, 1, "Generation", pad(tostring(format_int(ri.generationRate)), 11, " ") .. " rf/t", colors.white, colors.lime, colors.black)
 
     local tempColor = colors.red
     if ri.temperature <= 5000 then tempColor = colors.green end
@@ -225,7 +222,7 @@ function update()
     -- buttons
     drawButtons(8)
 
-    f.draw_text_lr(mon, 2, 9, 1, "Input Gate", f.format_int(influx.getSignalLowFlow()) .. " rf/t", colors.white, colors.blue, colors.black)
+    f.draw_text_lr(mon, 2, 9, 1, "Input Gate", pad(tostring(f.format_int(influx.getSignalLowFlow())),11," ") .. " rf/t", colors.white, colors.blue, colors.black)
 
     if autoInputGate == 1 then
       f.draw_text(mon, 14, 10, "AU", colors.green, colors.gray)
@@ -237,7 +234,7 @@ function update()
     local satPercent
     satPercent = math.ceil(ri.energySaturation / ri.maxEnergySaturation * 10000)*.01
 
-    f.draw_text_lr(mon, 2, 11, 1, "Energy Saturation", satPercent .. "%", colors.white, colors.white, colors.black)
+    f.draw_text_lr(mon, 2, 11, 1, "Energy Saturation", pad(tostring(satPercent),8," ") .. "%", colors.white, colors.white, colors.black)
     f.progress_bar(mon, 2, 12, mon.X-2, satPercent, 100, colors.blue, colors.gray)
 
     local fieldPercent, fieldColor
@@ -250,7 +247,7 @@ function update()
     if autoInputGate == 1 then 
       f.draw_text_lr(mon, 2, 14, 1, "Field Strength T:" .. targetStrength, fieldPercent .. "%", colors.white, fieldColor, colors.black)
     else
-      f.draw_text_lr(mon, 2, 14, 1, "Field Strength", fieldPercent .. "%", colors.white, fieldColor, colors.black)
+      f.draw_text_lr(mon, 2, 14, 1, "Field Strength", pad(tostring(fieldPercent),6," ") .. "%", colors.white, fieldColor, colors.black)
     end
     f.progress_bar(mon, 2, 15, mon.X-2, fieldPercent, 100, fieldColor, colors.gray)
 
@@ -263,10 +260,10 @@ function update()
     if fuelPercent >= 70 then fuelColor = colors.green end
     if fuelPercent < 70 and fuelPercent > 30 then fuelColor = colors.orange end
 
-    f.draw_text_lr(mon, 2, 17, 1, "Fuel ", fuelPercent .. "%", colors.white, fuelColor, colors.black)
+    f.draw_text_lr(mon, 2, 17, 1, "Fuel ", pad(tostring(fuelPercent),10," ") .. "%", colors.white, fuelColor, colors.black)
     f.progress_bar(mon, 2, 18, mon.X-2, fuelPercent, 100, fuelColor, colors.gray)
 
-    f.draw_text_lr(mon, 2, 19, 1, "Action ", action, colors.gray, colors.gray, colors.black)
+    f.draw_text_lr(mon, 2, 19, 1, "Action ", pad(action,20," "), colors.gray, colors.gray, colors.black)
 
     -- actual reactor interaction
     --
@@ -287,7 +284,7 @@ function update()
     end
 
     -- are we charged? lets activate
-    if ri.status == "charged" and activateOnCharged == 1 then
+    if ri.status == "warming_up" and activateOnCharged == 1 then
       reactor.activateReactor()
     end
 
