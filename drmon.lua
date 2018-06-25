@@ -1,8 +1,8 @@
 -- modifiable variables
 local reactorSide = "back"
 -- Names are displayed when you turn on the modem
-local igateName = "flux_gate_3"
-local ogateName = "flux_gate_2"
+local igateName = "flux_gate_1"
+local ogateName = "flux_gate_4"
 local monName = "monitor_0"
 
 local targetStrength = 50
@@ -168,7 +168,10 @@ function drawButtons(y)
   f.draw_text(mon, 25, y, " > ", colors.white, colors.gray)
 end
 
-
+function pad(str, len, char)
+    if char == nil then char = ' ' end
+    return str .. string.rep(char, len - #str)
+end
 
 function update()
   while true do 
@@ -207,8 +210,8 @@ function update()
       statusColor = colors.orange
     end
 
-    ri.status = string.format("%12s", ri.status)
-    genrate = string.format("%11s", tostring(ri.generationRate))
+    ri.status = pad(ri.status, 12, " ")
+    genrate = pad(tostring(ri.generationRate), 11, " ")
 
     f.draw_text_lr(mon, 2, 2, 1, "Reactor Status", string.upper(ri.status), colors.white, statusColor, colors.black)
     f.draw_text_lr(mon, 2, 4, 1, "Generation", genrate .. " rf/t", colors.white, colors.lime, colors.black)
@@ -216,8 +219,8 @@ function update()
     local tempColor = colors.red
     if ri.temperature <= 5000 then tempColor = colors.green end
     if ri.temperature >= 5000 and ri.temperature <= 6500 then tempColor = colors.orange end
-    f.draw_text_lr(mon, 2, 6, 1, "Temperature", f.format_int(ri.temperature) .. "C", colors.white, tempColor, colors.black)
-    f.draw_text_lr(mon, 2, 7, 1, "Output Gate", f.format_int(outflux.getSignalLowFlow()) .. " rf/t", colors.white, colors.blue, colors.black)
+    f.draw_text_lr(mon, 2, 6, 1, "Temperature", pad(tostring(f.format_int(ri.temperature)),14," ") .. "C", colors.white, tempColor, colors.black)
+    f.draw_text_lr(mon, 2, 7, 1, "Output Gate", pad(tostring(f.format_int(outflux.getSignalLowFlow())),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
 
     -- buttons
     drawButtons(8)
