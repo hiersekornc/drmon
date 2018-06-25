@@ -199,7 +199,7 @@ function update()
     local statusColor
     statusColor = colors.red
 
-    if ri.status == "running" or ri.status == "charged" then
+    if ri.status == "running" then
       statusColor = colors.green
     elseif ri.status == "offline" then
       statusColor = colors.gray
@@ -207,15 +207,16 @@ function update()
       statusColor = colors.orange
     end
 
-    f.draw_text_lr(mon, 2, 2, 1, "Reactor Status", string.upper(ri.status), colors.white, statusColor, colors.black)
+    ri.status = string.format("%12s", ri.status)
+    genrate = string.format("%11s", tostring(ri.generationRate))
 
-    f.draw_text_lr(mon, 2, 4, 1, "Generation", f.format_int(ri.generationRate) .. " rf/t", colors.white, colors.lime, colors.black)
+    f.draw_text_lr(mon, 2, 2, 1, "Reactor Status", string.upper(ri.status), colors.white, statusColor, colors.black)
+    f.draw_text_lr(mon, 2, 4, 1, "Generation", genrate .. " rf/t", colors.white, colors.lime, colors.black)
 
     local tempColor = colors.red
     if ri.temperature <= 5000 then tempColor = colors.green end
     if ri.temperature >= 5000 and ri.temperature <= 6500 then tempColor = colors.orange end
     f.draw_text_lr(mon, 2, 6, 1, "Temperature", f.format_int(ri.temperature) .. "C", colors.white, tempColor, colors.black)
-
     f.draw_text_lr(mon, 2, 7, 1, "Output Gate", f.format_int(outflux.getSignalLowFlow()) .. " rf/t", colors.white, colors.blue, colors.black)
 
     -- buttons
