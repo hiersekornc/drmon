@@ -210,20 +210,19 @@ function update()
       statusColor = colors.orange
     end
 
-    genrate = tostring(format_int(ri.generationRate))
     f.draw_text_lr(mon, 2, 2, 1, "Reactor Status", pad(string.upper(ri.status),12," "), colors.white, statusColor, colors.black)
-    f.draw_text_lr(mon, 2, 4, 1, "Generation", pad(genrate, 10, " ") .. " rf/t", colors.white, colors.lime, colors.black)
+    f.draw_text_lr(mon, 2, 4, 1, "Generation", pad(f.format_int(ri.generationRate), 10, " ") .. " rf/t", colors.white, colors.lime, colors.black)
 
     local tempColor = colors.red
     if ri.temperature <= 5000 then tempColor = colors.green end
     if ri.temperature >= 5000 and ri.temperature <= 6500 then tempColor = colors.orange end
-    f.draw_text_lr(mon, 2, 6, 1, "Temperature", pad(tostring(f.format_int(ri.temperature)),14," ") .. "C", colors.white, tempColor, colors.black)
-    f.draw_text_lr(mon, 2, 7, 1, "Output Gate", pad(tostring(f.format_int(outflux.getSignalLowFlow())),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
+    f.draw_text_lr(mon, 2, 6, 1, "Temperature", pad(f.format_int(ri.temperature),14," ") .. "C", colors.white, tempColor, colors.black)
+    f.draw_text_lr(mon, 2, 7, 1, "Output Gate", pad(f.format_int(outflux.getSignalLowFlow()),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
 
     -- buttons
     drawButtons(8)
 
-    f.draw_text_lr(mon, 2, 9, 1, "Input Gate", pad(tostring(f.format_int(influx.getSignalLowFlow())),11," ") .. " rf/t", colors.white, colors.blue, colors.black)
+    f.draw_text_lr(mon, 2, 9, 1, "Input Gate", pad(f.format_int(influx.getSignalLowFlow()),11," ") .. " rf/t", colors.white, colors.blue, colors.black)
 
     if autoInputGate == 1 then
       f.draw_text(mon, 14, 10, "AU", colors.green, colors.gray)
