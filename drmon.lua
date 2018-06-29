@@ -82,16 +82,6 @@ function load_config()
   sr.close()
 end
 
-
--- 1st time? save our settings, if not, load our settings
-if fs.exists("config.txt") == false then
-  save_config()
-else
-  load_config()
-  influx.setSignalLowFlow(iFlow)
-  outflux.setSignalLowFlow(oFlow)
-end
-
 function buttons()
 
   while true do
@@ -102,7 +92,7 @@ function buttons()
     -- 2-4 = -1000, 6-9 = -10000, 10-12,8 = -100000
     -- 17-19 = +1000, 21-23 = +10000, 25-27 = +100000
     if yPos == 8 then
-      local oFlow = outflux.getSignalLowFlow()
+      oFlow = outflux.getSignalLowFlow()
       if xPos >= 2 and xPos <= 4 then
         oFlow = oFlow-1000
       elseif xPos >= 6 and xPos <= 9 then
@@ -124,7 +114,7 @@ function buttons()
     -- 2-4 = -1000, 6-9 = -10000, 10-12,8 = -100000
     -- 17-19 = +1000, 21-23 = +10000, 25-27 = +100000
     if yPos == 10 and autoInputGate == 0 then
-      local iFlow = influx.getSignalLowFlow()
+      iFlow = influx.getSignalLowFlow()
       if xPos >= 2 and xPos <= 4 then
         iFlow = iFlow-1000
       elseif xPos >= 6 and xPos <= 9 then
@@ -327,6 +317,15 @@ function update()
 
     sleep(0.1)
   end
+end
+
+-- 1st time? save our settings, if not, load our settings
+if fs.exists("config.txt") == false then
+  save_config()
+else
+  load_config()
+  influx.setSignalLowFlow(iFlow)
+  outflux.setSignalLowFlow(oFlow)
 end
 
 parallel.waitForAny(update, buttons)
