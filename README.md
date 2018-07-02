@@ -1,4 +1,5 @@
 
+This is an adapted version of drmon written by acidjazz. It has been modified to work with 1.12.2 and has a new heature to monitor Draconium energy storage as well.
 ![](examples/2.jpg)
 > *status*: currently stable, writing documentation
 
@@ -12,7 +13,7 @@ NB: This is for Minecraft 1.7.10. You will need to edit references within the co
 
 
 ### tutorial
-you can find a very well made youtube tutorial on how to set this up [here](https://www.youtube.com/watch?v=8rBhQP1xqEU) , thank you [The MindCrafters](https://www.youtube.com/channel/UCf2wEy4_BbYpAQcgvN26OaQ)
+1.7.10 you can find a very well made youtube tutorial on how to set this up [here](https://www.youtube.com/watch?v=8rBhQP1xqEU) , thank you [The MindCrafters](https://www.youtube.com/channel/UCf2wEy4_BbYpAQcgvN26OaQ)
 
 ### features
 * uses a 3x3 advanced computer touchscreen monitor to interact with your reactor
@@ -33,25 +34,21 @@ you can find a very well made youtube tutorial on how to set this up [here](http
 * one fully setup draconic reactor with fuel
 * 1 advanced computer
 * 9 advanced monitors
-* 3 wired modems, wireless will not work
+* 4 wired modems, wireless will not work
 * a bunch of network cable
 
 ### installation
-* your reactor output flux gate must be setup so that one side of it and one of your stabilizers touches a side of the advanced computer
-* by default, flux gate should touch the right side, stabilizer should touch the back of the computer
-  * if you want to use different sides you need to modify `startup` after you have installed this and specify the sides
-* connect a modem to your input flux gate (the one connected to your reactor energy injector)
-* connect a modem to your advanced computer
-* setup yoru monitors to be a 3x3 and connect a modem to anywhere but the front
-* run network cable to all 3 modems
+* One of the reactor stabilizers needs to touch a side of the advanced computer
+* The flux gates and monitors need to be connected by modem
+ * connect a modem to your input flux gate (the one connected to your reactor energy injector)
+ * connect a modem to your output flux gate
+ * connect a modem to your advanced computer
+ * setup yoru monitors to be a 3x3 and connect a modem to anywhere but the front
+ * run network cable to all 4 modems
 * install this code via running the install script using these commands :
 
 ```
-> pastebin get Ls1Wg3QQ install
-> install
-```
-* modify `startup` if you wish to configure/alter any variables mentioned in the feature list, you'll find them at the top of the file
-```
+> pastebin get mgF6RZFQ startup
 > startup
 ```
 * you should see stats in your term, and on your monitor
@@ -61,8 +58,7 @@ you can find a very well made youtube tutorial on how to set this up [here](http
 * hold ctrl+t until you get a `>`
 
 ```
-> install
-> startup
+> reboot
 ```
 
 ### known issues

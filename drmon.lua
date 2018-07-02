@@ -1,9 +1,4 @@
--- modifiable variables
-local reactorSide = "back"
--- Names are displayed when you turn on the modem
-local igateName = "flux_gate_1"
-local ogateName = "flux_gate_4"
-local monName = "monitor_0"
+local reactorSide, igateName, ogateName, monName, oFlow, iFlow, mon, monitor, monX, monY, reactor, outflux, influx, ri, monType
 
 local targetStrength = 50
 local maxTemperature = 8000
@@ -15,22 +10,9 @@ local activateOnCharged = 1
 -- please leave things untouched from here on
 os.loadAPI("lib/f")
 
-local version = "0.30"
+local version = "4.0"
 -- toggleable via the monitor, use our algorithm to achieve our target field strength or let the user tweak it
 local autoInputGate = 1
-local oFlow = 0
-local iFlow = 222000
-
--- monitor 
-local mon, monitor, monX, monY
-
--- peripherals
-local reactor
-local outflux
-local influx
-
--- reactor information
-local ri
 
 -- last performed action
 local action = "None since reboot"
@@ -42,33 +24,22 @@ influx = peripheral.wrap(igateName)
 outflux = peripheral.wrap(ogateName)
 reactor = peripheral.wrap(reactorSide)
 
-if monitor == null then
-	error("No valid monitor was found")
-end
-
-if outflux == null then
-	error("No valid fluxgate was found")
-end
-
-if reactor == null then
-	error("No valid reactor was found")
-end
-
-if influx == null then
-	error("No valid flux gate was found")
-end
-
 monX, monY = monitor.getSize()
 mon = {}
 mon.monitor,mon.X, mon.Y = monitor, monX, monY
 
 --write settings to config file
 function save_config()
-  sw = fs.open("config.txt", "w")   
+  sw = fs.open("config.txt", "w")
   sw.writeLine(version)
-  sw.writeLine(autoInputGate)
-  sw.writeLine(iFlow)
+  sw.writeLine(monType)
+  sw.writeLine(reactorSide)
+  sw.writeLine(igateName)
+  sw.writeLine(ogateName)
+  sw.writeLine(monName)
   sw.writeLine(oFlow)
+  sw.writeLine(iFlow)
+  sw.writeLine(autoInputGate)
   sw.close()
 end
 
@@ -76,15 +47,26 @@ end
 function load_config()
   sr = fs.open("config.txt", "r")
   version = sr.readLine()
-  autoInputGate = tonumber(sr.readLine())
-  iFlow = tonumber(sr.readLine())
-  oFlow = tonumber(sr.readLine())
+  monType = sr.readLine()
+  reactorSide = sr.readLine()
+  igateName = sr.readLine()
+  ogateName = sr.readLine()
+  monName = sr.readLine()
+  oFlow = sr.readLine()
+  iFlow = sr.readLine()
+  autoInputGate = sr.readLine()
   sr.close()
+  autoInputGate = tonumber(autoInputGate)
+  iFlow = tonumber(iFlow)
+  oFlow = tonumber(oFlow)
 end
 
 function buttons()
 
   while true do
+    load_config()
+    outflux.setSignalLowFlow(oFlow)
+    influx.setSignalLowFlow(iFlow)
     -- button handler
     event, side, xPos, yPos = os.pullEvent("monitor_touch")
 
@@ -92,7 +74,6 @@ function buttons()
     -- 2-4 = -1000, 6-9 = -10000, 10-12,8 = -100000
     -- 17-19 = +1000, 21-23 = +10000, 25-27 = +100000
     if yPos == 8 then
-      oFlow = outflux.getSignalLowFlow()
       if xPos >= 2 and xPos <= 4 then
         oFlow = oFlow-1000
       elseif xPos >= 6 and xPos <= 9 then
@@ -114,7 +95,6 @@ function buttons()
     -- 2-4 = -1000, 6-9 = -10000, 10-12,8 = -100000
     -- 17-19 = +1000, 21-23 = +10000, 25-27 = +100000
     if yPos == 10 and autoInputGate == 0 then
-      iFlow = influx.getSignalLowFlow()
       if xPos >= 2 and xPos <= 4 then
         iFlow = iFlow-1000
       elseif xPos >= 6 and xPos <= 9 then
@@ -262,7 +242,7 @@ function update()
     end
     
     -- are we charging? open the floodgates
-    if ri.status == "charging" then
+    if ri.status == "warming_up" then
       influx.setSignalLowFlow(900000)
       emergencyCharge = false
     end
@@ -319,14 +299,9 @@ function update()
   end
 end
 
--- 1st time? save our settings, if not, load our settings
-if fs.exists("config.txt") == false then
-  save_config()
-else
-  load_config()
-  influx.setSignalLowFlow(iFlow)
-  outflux.setSignalLowFlow(oFlow)
-end
+load_config()
+influx.setSignalLowFlow(iFlow)
+outflux.setSignalLowFlow(oFlow)
 
 parallel.waitForAny(update, buttons)
 
