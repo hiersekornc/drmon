@@ -59,6 +59,8 @@ local function bwOc(c,bw)
 end
 
 function detect()
+  first = ""
+  second = ""
   local p = peripheral.getNames()
   if table.getn(p) == 0 then
     term.clear()

@@ -19,15 +19,6 @@ local action = "None since reboot"
 local emergencyCharge = false
 local emergencyTemp = false
 
-monitor = peripheral.wrap(monName)
-influx = peripheral.wrap(igateName)
-outflux = peripheral.wrap(ogateName)
-reactor = peripheral.wrap(reactorSide)
-
-monX, monY = monitor.getSize()
-mon = {}
-mon.monitor,mon.X, mon.Y = monitor, monX, monY
-
 --write settings to config file
 function save_config()
   sw = fs.open("config.txt", "w")
@@ -302,6 +293,15 @@ end
 load_config()
 influx.setSignalLowFlow(iFlow)
 outflux.setSignalLowFlow(oFlow)
+
+monitor = peripheral.wrap(monName)
+influx = peripheral.wrap(igateName)
+outflux = peripheral.wrap(ogateName)
+reactor = peripheral.wrap(reactorSide)
+
+monX, monY = monitor.getSize()
+mon = {}
+mon.monitor,mon.X, mon.Y = monitor, monX, monY
 
 parallel.waitForAny(update, buttons)
 
