@@ -216,7 +216,7 @@ if fs.exists("config.txt") == false then
   save_config()
 else
   load_config()
-  if version != "4.0" then
+  if version ~= "4.0" then
     detect()
     runMenu()
     save_config()

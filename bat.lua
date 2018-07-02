@@ -37,6 +37,7 @@ function update()
     mon.setTextColor(colors.white)
     mon.setCursorPos(2,9)
     mon.write(format_int(rate))
+    sleep(1)
   end
 end
 
