@@ -69,7 +69,7 @@ function detect()
   end
   for i = 1, #p do
     if string.find(p[i],"monitor") then
-      monitor = p[1]
+      monitor = p[i]
     end
     if string.find(p[i],"flux") then
       if string.find(first,"flux") then
