@@ -288,13 +288,14 @@ function update()
 end
 
 load_config()
-influx.setSignalLowFlow(iFlow)
-outflux.setSignalLowFlow(oFlow)
 
 monitor = peripheral.wrap(monName)
 influx = peripheral.wrap(igateName)
 outflux = peripheral.wrap(ogateName)
 reactor = peripheral.wrap(reactorSide)
+
+influx.setSignalLowFlow(iFlow)
+outflux.setSignalLowFlow(oFlow)
 
 monX, monY = monitor.getSize()
 mon = {}
