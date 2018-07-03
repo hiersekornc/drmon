@@ -202,7 +202,7 @@ local function runMenu()
         end
       end
     end
-    if selectedi == 2 then
+    if selected == 2 then
       flowIn = second
       flowOut = first
     else
