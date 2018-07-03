@@ -219,6 +219,7 @@ if fs.exists("config.txt") == false then
 else
   load_config()
   if version ~= "4.0" then
+    version = "4.0"
     detect()
     runMenu()
     save_config()
