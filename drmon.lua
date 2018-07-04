@@ -288,22 +288,23 @@ function update()
 end
 
 function wireless()
-  while true do
-    local modem
-    local list = peripheral.getNames()
-    for i = 1, #list do
-      check = peripheral.getMethods(list[i])
-      for a = 1, #check do
-        if check[a] == "isWireless" then
-          test = peripheral.wrap(list[i])
-          print(test.isWireless())
-          if test.isWireless() then
-            modem = peripheral.wrap(list[i])
-          end
+  local modem
+  local list = peripheral.getNames()
+  for i = 1, #list do
+    check = peripheral.getMethods(list[i])
+    for a = 1, #check do
+      if check[a] == "isWireless" then
+        test = peripheral.wrap(list[i])
+        print(test.isWireless())
+        if test.isWireless() then
+          modem = peripheral.wrap(list[i])
+          print("gotit")
         end
       end
     end
-    if not modem then
+  end
+  if modem then
+    while true do
       if not modem.isOpen(1) then
         modem.open(1)
       end
@@ -329,5 +330,5 @@ monX, monY = monitor.getSize()
 mon = {}
 mon.monitor,mon.X, mon.Y = monitor, monX, monY
 
-parallel.waitForAny(update, buttons, wireless)
+parallel.waitForAll(update, buttons, wireless)
 
