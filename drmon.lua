@@ -288,22 +288,22 @@ function update()
 end
 
 function wireless()
-  local modem
-  local list = peripheral.getNames()
-  for i = 1, #list do
-    check = peripheral.getMethods(list[i])
-    for a = 1, #check do
-      if check[a] == "isWireless" then
-        test = peripheral.wrap(list[i])
-        if test.isWireless() then
-          modem = peripheral.wrap(list[i])
-          break
+  while true do
+    local modem
+    local list = peripheral.getNames()
+    for i = 1, #list do
+      check = peripheral.getMethods(list[i])
+      for a = 1, #check do
+        if check[a] == "isWireless" then
+          test = peripheral.wrap(list[i])
+          print(test.isWireless())
+          if test.isWireless() then
+            modem = peripheral.wrap(list[i])
+          end
         end
       end
     end
-  end
-  if not modem then
-    while true do
+    if not modem then
       if not modem.isOpen(1) then
         modem.open(1)
       end
