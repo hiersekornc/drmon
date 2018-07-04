@@ -315,8 +315,6 @@ function wireless()
   end
 end
 
-print(gotit.isWireless())
-
 load_config()
 
 monitor = peripheral.wrap(monName)
