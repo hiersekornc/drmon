@@ -342,6 +342,7 @@ function wireless()
       end
       if message == "startup" then
         reactor.chargeReactor()
+        reactor.activateReactor()
       end
       if message == "checkin" then
         modem.transmit(channel, channel, "respond")
