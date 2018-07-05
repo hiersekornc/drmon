@@ -321,11 +321,13 @@ function wireless()
           modem.transmit(channel, channel, "checkin")
           local timeout = os.startTimer(5)
           event = {os.pullEvent()}
+          print("got event: ", event, channel, scan)
           if event[1] == "modem_message" then
             if event[5] == "respond" then
               modem.close(channel)
               channel = channel + 1
               scan = channel + 1
+              os.cancelTimer(timeout)
             end
           elseif event[1] == "timer" and event[2] == timeout then
             scan = channel
