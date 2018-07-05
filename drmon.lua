@@ -1,4 +1,4 @@
-local reactorSide, igateName, ogateName, monName, oFlow, iFlow, mon, monitor, monX, monY, reactor, outflux, influx, ri, monType
+local reactorSide, igateName, ogateName, monName, oFlow, iFlow, mon, monitor, monX, monY, reactor, outflux, influx, ri, monType, modem, message
 
 local targetStrength = 50
 local maxTemperature = 8000
@@ -6,6 +6,7 @@ local safeTemperature = 3000
 local lowestFieldPercent = 15
 
 local activateOnCharged = 1
+local channel = 0
 
 -- please leave things untouched from here on
 os.loadAPI("lib/f")
@@ -31,6 +32,7 @@ function save_config()
   sw.writeLine(oFlow)
   sw.writeLine(iFlow)
   sw.writeLine(autoInputGate)
+  sw.writeLine(channel)
   sw.close()
 end
 
@@ -46,6 +48,7 @@ function load_config()
   oFlow = tonumber(sr.readLine())
   iFlow = tonumber(sr.readLine())
   autoInputGate = tonumber(sr.readLine())
+  channel = tonumber(sr.readLine())
   sr.close()
 end
 
@@ -154,6 +157,8 @@ function update()
     end
     print("Output Gate: ", outflux.getSignalLowFlow())
     print("Input Gate: ", influx.getSignalLowFlow())
+    print("Channel: ", channel)
+    print("Last Message:: ", message)
 
     -- monitor output
 
@@ -287,6 +292,67 @@ function update()
   end
 end
 
+function wireless()
+  load_config()
+  local scan = channel
+  local list = peripheral.getNames()
+  for i = 1, #list do
+    check = peripheral.getMethods(list[i])
+    for a = 1, #check do
+      if check[a] == "isWireless" then
+        test = peripheral.wrap(list[i])
+        if test.isWireless() then
+          modem = peripheral.wrap(list[i])
+        end
+      end
+    end
+  end
+  if modem then
+    while true do
+      if channel > 0 then
+        if not modem.isOpen(channel) then
+          modem.open(channel)
+        end
+      else
+        channel = 1
+        scan = channel + 1
+        while scan > channel do
+          modem.open(channel)
+          modem.transmit(channel, channel, "checkin")
+          local timeout = os.startTimer(5)
+          event = {os.pullEvent()}
+          if event[1] == "modem_message" then
+            if event[5] == "respond" then
+              modem.close(channel)
+              channel = channel + 1
+              scan = channel + 1
+            end
+          elseif event[1] == "timer" and event[2] == timeout then
+            scan = channel
+          end
+        end
+      end
+      save_config()
+      event, side, frequency, replyFrequency, message, distance = os.pullEvent("modem_message")
+      if message == "reboot" then
+        os.reboot()
+      end
+      if message == "shutdown" then
+        reactor.stopReactor()
+      end
+      if message == "startup" then
+        reactor.chargeReactor()
+      end
+      if message == "checkin" then
+        modem.transmit(channel, channel, "respond")
+      end
+      if message == "status" then
+        modem.transmit(channel, channel, ri)
+      end
+    end
+  end
+end
+
 load_config()
 
 monitor = peripheral.wrap(monName)
@@ -301,5 +367,5 @@ monX, monY = monitor.getSize()
 mon = {}
 mon.monitor,mon.X, mon.Y = monitor, monX, monY
 
-parallel.waitForAny(update, buttons)
+parallel.waitForAll(update, buttons, wireless)
 
