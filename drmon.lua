@@ -354,7 +354,10 @@ function wireless()
   end
 end
 
-load_config()
+if not pcall(load_config) then
+  channel = 0
+  save_config()
+end
 
 monitor = peripheral.wrap(monName)
 influx = peripheral.wrap(igateName)
