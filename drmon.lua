@@ -1,4 +1,4 @@
-local reactorSide, igateName, ogateName, monName, oFlow, iFlow, mon, monitor, monX, monY, reactor, outflux, influx, ri, monType, modem
+local reactorSide, igateName, ogateName, monName, oFlow, iFlow, mon, monitor, monX, monY, reactor, outflux, influx, ri, monType, modem, message
 
 local targetStrength = 50
 local maxTemperature = 8000
@@ -158,6 +158,7 @@ function update()
     print("Output Gate: ", outflux.getSignalLowFlow())
     print("Input Gate: ", influx.getSignalLowFlow())
     print("Channel: ", channel)
+    print("Last Message:: ", message)
 
     -- monitor output
 
@@ -344,6 +345,9 @@ function wireless()
       end
       if message == "checkin" then
         modem.transmit(channel, channel, "respond")
+      end
+      if message == "status" then
+        modem.transmit(channel, channel, ri)
       end
     end
   end
