@@ -44,7 +44,6 @@ function save_config()
   sw.writeLine("0")
   sw.writeLine("900000")
   sw.writeLine("1")
-  sw.writeLine("0")
   sw.close()
 end
 

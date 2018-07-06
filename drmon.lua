@@ -6,7 +6,6 @@ local safeTemperature = 3000
 local lowestFieldPercent = 15
 
 local activateOnCharged = 1
-local channel = 0
 
 -- please leave things untouched from here on
 os.loadAPI("lib/f")
@@ -32,7 +31,6 @@ function save_config()
   sw.writeLine(oFlow)
   sw.writeLine(iFlow)
   sw.writeLine(autoInputGate)
-  sw.writeLine(channel)
   sw.close()
 end
 
@@ -48,7 +46,6 @@ function load_config()
   oFlow = tonumber(sr.readLine())
   iFlow = tonumber(sr.readLine())
   autoInputGate = tonumber(sr.readLine())
-  channel = tonumber(sr.readLine())
   sr.close()
 end
 
@@ -136,18 +133,13 @@ end
 
 function update()
   while true do 
-
     term.clear()
     term.setCursorPos(1,1)
-
     ri = reactor.getReactorInfo()
-
     -- print out all the infos from .getReactorInfo() to term
-
     if ri == nil then
       error("reactor has an invalid setup")
     end
-
     for k, v in pairs (ri) do
       if k == "failSafe" then
         print(k.. ": ".. tostring(v))
@@ -157,14 +149,10 @@ function update()
     end
     print("Output Gate: ", outflux.getSignalLowFlow())
     print("Input Gate: ", influx.getSignalLowFlow())
-    print("Channel: ", channel)
-    print("Last Message:: ", message)
-
+    print("Last Message: ", message)
     -- monitor output
-
     local statusColor
     statusColor = colors.red
-
     if ri.status == "running" then
       statusColor = colors.green
     elseif ri.status == "offline" then
@@ -172,41 +160,31 @@ function update()
     elseif ri.status == "warming_up" then
       statusColor = colors.orange
     end
-
     f.draw_text_lr(mon, 2, 2, 1, "Reactor Status", pad(string.upper(ri.status),12," "), colors.white, statusColor, colors.black)
     f.draw_text_lr(mon, 2, 4, 1, "Generation", pad(f.format_int(ri.generationRate), 10, " ") .. " rf/t", colors.white, colors.lime, colors.black)
-
     local tempColor = colors.red
     if ri.temperature <= 5000 then tempColor = colors.green end
     if ri.temperature >= 5000 and ri.temperature <= 6500 then tempColor = colors.orange end
     f.draw_text_lr(mon, 2, 6, 1, "Temperature", pad(f.format_int(ri.temperature),13," ") .. " C", colors.white, tempColor, colors.black)
     f.draw_text_lr(mon, 2, 7, 1, "Output Gate", pad(f.format_int(outflux.getSignalLowFlow()),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
-
     -- buttons
     drawButtons(8)
-
     f.draw_text_lr(mon, 2, 9, 1, "Input Gate", pad(f.format_int(influx.getSignalLowFlow()),11," ") .. " rf/t", colors.white, colors.blue, colors.black)
-
     if autoInputGate == 1 then
       f.draw_text(mon, 14, 10, "AU", colors.green, colors.gray)
     else
       f.draw_text(mon, 14, 10, "MA", colors.white, colors.gray)
       drawButtons(10)
     end
-
     local satPercent
     satPercent = math.ceil(ri.energySaturation / ri.maxEnergySaturation * 10000)*.01
-
     f.draw_text_lr(mon, 2, 11, 1, "Energy Saturation", pad(tostring(satPercent),8," ") .. "%", colors.white, colors.white, colors.black)
     f.progress_bar(mon, 2, 12, mon.X-2, satPercent, 100, colors.blue, colors.gray)
-
     local fieldPercent, fieldColor
     fieldPercent = math.ceil(ri.fieldStrength / ri.maxFieldStrength * 10000)*.01
-
     fieldColor = colors.red
     if fieldPercent >= 50 then fieldColor = colors.green end
     if fieldPercent < 50 and fieldPercent > 30 then fieldColor = colors.orange end
-
     if autoInputGate == 1 then 
       f.draw_text_lr(mon, 2, 14, 1, "Field Strength T:" .. targetStrength, fieldPercent .. "%", colors.white, fieldColor, colors.black)
     else
@@ -215,42 +193,32 @@ function update()
     f.progress_bar(mon, 2, 15, mon.X-2, fieldPercent, 100, fieldColor, colors.gray)
 
     local fuelPercent, fuelColor
-
     fuelPercent = 100 - math.ceil(ri.fuelConversion / ri.maxFuelConversion * 10000)*.01
-
     fuelColor = colors.red
-
     if fuelPercent >= 70 then fuelColor = colors.green end
     if fuelPercent < 70 and fuelPercent > 30 then fuelColor = colors.orange end
-
     f.draw_text_lr(mon, 2, 17, 1, "Fuel ", pad(tostring(fuelPercent),10," ") .. "%", colors.white, fuelColor, colors.black)
     f.progress_bar(mon, 2, 18, mon.X-2, fuelPercent, 100, fuelColor, colors.gray)
-
     f.draw_text_lr(mon, 2, 19, 1, "Action ", pad(action,20," "), colors.gray, colors.gray, colors.black)
-
     -- actual reactor interaction
     --
     if emergencyCharge == true then
       reactor.chargeReactor()
     end
-    
     -- are we charging? open the floodgates
     if ri.status == "warming_up" then
       influx.setSignalLowFlow(900000)
       emergencyCharge = false
     end
-
     -- are we stopping from a shutdown and our temp is better? activate
     if emergencyTemp == true and ri.status == "stopping" and ri.temperature < safeTemperature then
       reactor.activateReactor()
       emergencyTemp = false
     end
-
     -- are we charged? lets activate
     if ri.status == "warming_up" and activateOnCharged == 1 then
       reactor.activateReactor()
     end
-
     -- are we on? regulate the input fludgate to our target field strength
     -- or set it to our saved setting since we are on manual
     if ri.status == "running" then
@@ -263,16 +231,13 @@ function update()
       end
       save_config()
     end
-
     -- safeguards
     --
-    
     -- out of fuel, kill it
     if fuelPercent <= 10 then
       reactor.stopReactor()
       action = "Fuel below 10%, refuel"
     end
-
     -- field strength is too dangerous, kill and it try and charge it before it blows
     if fieldPercent <= lowestFieldPercent and ri.status == "running" then
       action = "Field Str < " ..lowestFieldPercent.."%"
@@ -280,21 +245,18 @@ function update()
       reactor.chargeReactor()
       emergencyCharge = true
     end
-
     -- temperature too high, kill it and activate it when its cool
     if ri.temperature > maxTemperature then
       reactor.stopReactor()
       action = "Temp > " .. maxTemperature
       emergencyTemp = true
     end
-
     sleep(0.1)
   end
 end
 
 function wireless()
-  load_config()
-  local scan = channel
+  modem = "none"
   local list = peripheral.getNames()
   for i = 1, #list do
     check = peripheral.getMethods(list[i])
@@ -302,40 +264,17 @@ function wireless()
       if check[a] == "isWireless" then
         test = peripheral.wrap(list[i])
         if test.isWireless() then
-          modem = peripheral.wrap(list[i])
+          modem = list[i]
         end
       end
     end
   end
-  if modem then
+  if modem ~= "none" then
     while true do
-      if channel > 0 then
-        if not modem.isOpen(channel) then
-          modem.open(channel)
-        end
-      else
-        channel = 1
-        scan = channel + 1
-        while scan > channel do
-          modem.open(channel)
-          modem.transmit(channel, channel, "checkin")
-          local timeout = os.startTimer(5)
-          event = {os.pullEvent()}
-          print("got event: ", event, channel, scan)
-          if event[1] == "modem_message" then
-            if event[5] == "respond" then
-              modem.close(channel)
-              channel = channel + 1
-              scan = channel + 1
-              os.cancelTimer(timeout)
-            end
-          elseif event[1] == "timer" and event[2] == timeout then
-            scan = channel
-          end
-        end
+      if not rednet.isOpen(modem) then
+          rednet.open(modem)
       end
-      save_config()
-      event, side, frequency, replyFrequency, message, distance = os.pullEvent("modem_message")
+      id,message = rednet.receive()
       if message == "reboot" then
         os.reboot()
       end
@@ -347,17 +286,16 @@ function wireless()
         reactor.activateReactor()
       end
       if message == "checkin" then
-        modem.transmit(channel, channel, "respond")
+        rednet.send(id, "hello")
       end
       if message == "status" then
-        modem.transmit(channel, channel, ri)
+        rednet.send(id,ri)
       end
     end
   end
 end
 
 if not pcall(load_config) then
-  channel = 0
   save_config()
 end
 
