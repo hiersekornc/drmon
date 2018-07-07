@@ -255,6 +255,15 @@ function update()
   end
 end
 
+function patch()
+  local installURL = "https://raw.githubusercontent.com/aedan/drmon/master/install.lua"
+  install = http.get(installURL)
+  installFile = install.readAll()
+  local file = fs.open("startup", "w")
+  file.write(installFile)
+  file.close()
+end
+
 function wireless()
   modem = "none"
   local list = peripheral.getNames()
@@ -290,6 +299,19 @@ function wireless()
       end
       if message == "status" then
         rednet.send(id,ri)
+      end
+      if message == "patch" then
+        patch()
+        os.reboot()
+      end
+      if message == "identify" then
+        if mon.getBackgroundColor() == colors.black then
+          mon.setBackgroundColor(colors.lightBlue)
+          mon.clear()
+        else
+          mon.setBackgroundColor(colors.black)
+          mon.clear()
+        end
       end
     end
   end
