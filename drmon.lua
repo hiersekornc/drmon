@@ -306,14 +306,15 @@ function wireless()
         os.reboot()
       end
       if message == "identify" then
-        if identify then
+        if identify == true then
           monitor.setBackgroundColor(colors.lightBlue)
+          monitor.clear()
           identify = false
         else
           monitor.setBackgroundColor(colors.black)
+          monitor.clear()
           identify = true
         end
-        monitor.clear()
       end
     end
   end
