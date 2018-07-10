@@ -6,6 +6,7 @@ local safeTemperature = 3000
 local lowestFieldPercent = 15
 
 local activateOnCharged = 1
+local identify = false
 
 -- please leave things untouched from here on
 os.loadAPI("lib/f")
@@ -305,13 +306,12 @@ function wireless()
         os.reboot()
       end
       if message == "identify" then
-        if monitor.getBackgroundColor() == colors.black then
+        if identify then
           monitor.setBackgroundColor(colors.lightBlue)
-          monitor.clear()
         else
           monitor.setBackgroundColor(colors.black)
-          monitor.clear()
         end
+        monitor.clear()
       end
     end
   end
@@ -332,6 +332,8 @@ outflux.setSignalLowFlow(oFlow)
 monX, monY = monitor.getSize()
 mon = {}
 mon.monitor,mon.X, mon.Y = monitor, monX, monY
+monitor.setBackgroundColor(colors.black)
+monitor.clear()
 
 parallel.waitForAll(update, buttons, wireless)
 
