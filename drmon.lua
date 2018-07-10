@@ -305,12 +305,12 @@ function wireless()
         os.reboot()
       end
       if message == "identify" then
-        if mon.getBackgroundColor() == colors.black then
-          mon.setBackgroundColor(colors.lightBlue)
-          mon.clear()
+        if monitor.getBackgroundColor() == colors.black then
+          monitor.setBackgroundColor(colors.lightBlue)
+          monitor.clear()
         else
-          mon.setBackgroundColor(colors.black)
-          mon.clear()
+          monitor.setBackgroundColor(colors.black)
+          monitor.clear()
         end
       end
     end

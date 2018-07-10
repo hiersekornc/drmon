@@ -6,4 +6,4 @@ local file = fs.open("pocket", "w")
 file.write(pocketFile)
 file.close()
 
-require(pocket)
+require("pocket")
