@@ -308,8 +308,10 @@ function wireless()
       if message == "identify" then
         if identify then
           monitor.setBackgroundColor(colors.lightBlue)
+          identify = false
         else
           monitor.setBackgroundColor(colors.black)
+          identify = true
         end
         monitor.clear()
       end
