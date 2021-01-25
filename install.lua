@@ -2,9 +2,9 @@
 --
 --
 
-local libURL = "https://raw.githubusercontent.com/aedan/drmon/master/lib/f.lua"
+local libURL = "https://raw.githubusercontent.com/hiersekornc/drmon/full-auto/lib/f.lua"
 local reactorURL = "https://raw.githubusercontent.com/hiersekornc/drmon/full-auto/drmon.lua"
-local batURL = "https://raw.githubusercontent.com/aedan/drmon/master/bat.lua"
+local batURL = "https://raw.githubusercontent.com/hiersekornc/drmon/full-auto/bat.lua"
 local lib, reactor, bat, libFile, reactorFile, batFile, selected, monType, flowIn, FlowOut, rSide, monitor, first, second
 local version = "4.0"
 
