@@ -169,41 +169,45 @@ function update()
     f.draw_text_lr(mon, 2, 2, 1, "Reactor Status", pad(string.upper(ri.status),12," "), colors.white, statusColor, colors.black)
     f.draw_text_lr(mon, 2, 4, 1, "Generation", pad(f.format_int(ri.generationRate), 10, " ") .. " rf/t", colors.white, colors.lime, colors.black)
     local tempColor = colors.red
-    if ri.temperature <= 5000 then tempColor = colors.green end
-    if ri.temperature >= 5000 and ri.temperature <= 6500 then tempColor = colors.orange end
-    f.draw_text_lr(mon, 2, 6, 1, "Temperature", pad(f.format_int(ri.temperature),13," ") .. " C", colors.white, tempColor, colors.black)
-    f.draw_text_lr(mon, 2, 7, 1, "Output Gate", pad(f.format_int(outFlow),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
+    if ri.temperature <= 5000 then tempColor = colors.gray end
+    if ri.temperature > 7000 and ri.temperature <= 8000 then tempColor = colors.green end
+    if ri.temperature > 8000 and ri.temperature <= 8100 then tempColor = colors.orange end
+    f.draw_text_lr(mon, 2, 5, 1, "Temperature", pad(f.format_int(ri.temperature),13," ") .. " C", colors.white, tempColor, colors.black)
+    f.draw_text_lr(mon, 2, 8, 1, "Output Gate", pad(f.format_int(outFlow),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
     -- buttons
-    drawButtons(8)
+    -- drawButtons(8)
     f.draw_text_lr(mon, 2, 9, 1, "Input Gate", pad(f.format_int(inFlow),11," ") .. " rf/t", colors.white, colors.blue, colors.black)
-    if autoInputGate == 1 then
-      f.draw_text(mon, 14, 10, "AU", colors.green, colors.gray)
-    else
-      f.draw_text(mon, 14, 10, "MA", colors.white, colors.gray)
-      drawButtons(10)
-    end
-    local satPercent
-    satPercent = math.ceil(ri.energySaturation / ri.maxEnergySaturation * 10000)*.01
-    f.draw_text_lr(mon, 2, 11, 1, "Energy Saturation", pad(tostring(satPercent),8," ") .. "%", colors.white, colors.white, colors.black)
-    f.progress_bar(mon, 2, 12, mon.X-2, satPercent, 100, colors.blue, colors.gray)
+    -- if autoInputGate == 1 then
+    --   f.draw_text(mon, 14, 10, "AU", colors.green, colors.gray)
+    -- else
+    --   f.draw_text(mon, 14, 10, "MA", colors.white, colors.gray)
+    --   drawButtons(10)
+    -- end
+    -- local satPercent
+    -- satPercent = math.ceil(ri.energySaturation / ri.maxEnergySaturation * 10000)*.01
+    -- f.draw_text_lr(mon, 2, 11, 1, "Energy Saturation", pad(tostring(satPercent),8," ") .. "%", colors.white, colors.white, colors.black)
+    -- f.progress_bar(mon, 2, 12, mon.X-2, satPercent, 100, colors.blue, colors.gray)
     local fieldPercent, fieldColor
     fieldPercent = math.ceil(ri.fieldStrength / ri.maxFieldStrength * 10000)*.01
     fieldColor = colors.red
     if fieldPercent >= 50 then fieldColor = colors.green end
     if fieldPercent < 50 and fieldPercent > 30 then fieldColor = colors.orange end
-    if autoInputGate == 1 then 
-      f.draw_text_lr(mon, 2, 14, 1, "Field Strength T:" .. targetStrength, fieldPercent .. "%", colors.white, fieldColor, colors.black)
-    else
-      f.draw_text_lr(mon, 2, 14, 1, "Field Strength", pad(tostring(fieldPercent),6," ") .. "%", colors.white, fieldColor, colors.black)
-    end
-    f.progress_bar(mon, 2, 15, mon.X-2, fieldPercent, 100, fieldColor, colors.gray)
+    -- if autoInputGate == 1 then 
+      f.draw_text_lr(mon, 2, 13, 1, "Field Strength T:" .. targetStrength, pad(tostring(fieldPercent),6," ") .. "%", colors.white, fieldColor, colors.black)
+    -- else
+    --   f.draw_text_lr(mon, 2, 14, 1, "Field Strength", pad(tostring(fieldPercent),6," ") .. "%", colors.white, fieldColor, colors.black)
+    -- end
+    f.progress_bar(mon, 2, 14, mon.X-2, fieldPercent, 100, fieldColor, colors.gray)
 
     local fuelPercent, fuelColor
     fuelPercent = 100 - math.ceil(ri.fuelConversion / ri.maxFuelConversion * 10000)*.01
     fuelColor = colors.red
     if fuelPercent >= 70 then fuelColor = colors.green end
     if fuelPercent < 70 and fuelPercent > 30 then fuelColor = colors.orange end
-    f.draw_text_lr(mon, 2, 17, 1, "Fuel ", pad(tostring(fuelPercent),10," ") .. "%", colors.white, fuelColor, colors.black)
+    f.draw_text_lr(mon, 2, 16, 1, "Fuel ", pad(tostring(fuelPercent),10," ") .. "%", colors.white, fuelColor, colors.black)
+    local eta
+    eta = reactorInfo.fuelConversionRate * ( ri.maxFuelConversion - ri.fuelConversion ) / 20
+    f.draw_text_lr(mon, 2, 17, 1, "ETA ", pad(tostring(eta),11," ") .. "s", colors.white, fuelColor, colors.black)
     f.progress_bar(mon, 2, 18, mon.X-2, fuelPercent, 100, fuelColor, colors.gray)
     f.draw_text_lr(mon, 2, 19, 1, "Action ", pad(action,20," "), colors.gray, colors.gray, colors.black)
     -- actual reactor interaction
@@ -228,16 +232,16 @@ function update()
     -- are we on? regulate the input fludgate to our target field strength
     -- or set it to our saved setting since we are on manual
     if ri.status == "running" then
-      if autoInputGate == 1 then 
+      -- if autoInputGate == 1 then 
         autoInFlux = ri.fieldDrainRate / (1 - (targetStrength/100) )
         autoOutFlux = ri.generationRate / (ri.temperature / targetTemperature)
         print("Target Input Gate: ".. autoInFlux)
         print("Target Output Gate: ".. autoOutFlux)
         influx.setSignalLowFlow(autoInFlux)
         outflux.setSignalLowFlow(autoOutFlux)
-      else
-        influx.setSignalLowFlow(iFlow)
-      end
+      -- else
+      --   influx.setSignalLowFlow(iFlow)
+      -- end
       save_config()
     end
     -- safeguards
@@ -346,5 +350,6 @@ mon.monitor,mon.X, mon.Y = monitor, monX, monY
 monitor.setBackgroundColor(colors.black)
 monitor.clear()
 
-parallel.waitForAll(update, buttons, wireless)
+-- parallel.waitForAll(update, buttons, wireless)
+parallel.waitForAll(update, wireless)
 
