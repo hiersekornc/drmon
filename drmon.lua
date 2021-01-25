@@ -3,7 +3,7 @@ local reactorSide, igateName, ogateName, monName, oFlow, iFlow, mon, monitor, mo
 local targetStrength = 25
 local maxTemperature = 7900
 local safeTemperature = 3000
-local targetTemperature = 7500
+local targetTemperature = 7000
 local lowestFieldPercent = 15
 
 local activateOnCharged = 1
