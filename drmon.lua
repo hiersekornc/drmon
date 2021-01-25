@@ -1,7 +1,7 @@
 local reactorSide, igateName, ogateName, monName, oFlow, iFlow, mon, monitor, monX, monY, reactor, outflux, influx, ri, monType, modem, message
 
 local targetStrength = 25
-local maxTemperature = 8000
+local maxTemperature = 7900
 local safeTemperature = 3000
 local targetTemperature = 7500
 local lowestFieldPercent = 15
@@ -12,7 +12,7 @@ local identify = false
 -- please leave things untouched from here on
 os.loadAPI("lib/f")
 
-local version = "4.0"
+local version = "4.1"
 -- toggleable via the monitor, use our algorithm to achieve our target field strength or let the user tweak it
 local autoInputGate = 1
 
@@ -58,75 +58,13 @@ function buttons()
     outflux.setSignalLowFlow(oFlow)
     influx.setSignalLowFlow(iFlow)
     -- button handler
-    -- event, side, xPos, yPos = os.pullEvent("monitor_touch")
-
-    -- output gate controls
-    -- 2-4 = -1000, 6-9 = -10000, 10-12,8 = -100000
-    -- 17-19 = +1000, 21-23 = +10000, 25-27 = +100000
-    -- if yPos == 8 then
-    -- if xPos >= 2 and xPos <= 4 then
-    -- oFlow = oFlow-1000
-    -- elseif xPos >= 6 and xPos <= 9 then
-    -- oFlow = oFlow-10000
-    -- elseif xPos >= 10 and xPos <= 12 then
-    -- oFlow = oFlow-100000
-    -- elseif xPos >= 17 and xPos <= 19 then
-    -- oFlow = oFlow+100000
-    -- elseif xPos >= 21 and xPos <= 23 then
-    -- oFlow = oFlow+10000
-    -- elseif xPos >= 25 and xPos <= 27 then
-    -- oFlow = oFlow+1000
-    -- end
-    -- outflux.setSignalLowFlow(oFlow)
-    -- save_config()
-    -- end
-
-    -- input gate controls
-    -- 2-4 = -1000, 6-9 = -10000, 10-12,8 = -100000
-    -- 17-19 = +1000, 21-23 = +10000, 25-27 = +100000
-    -- if yPos == 10 and autoInputGate == 0 then
-    -- if xPos >= 2 and xPos <= 4 then
-    -- iFlow = iFlow-1000
-    -- elseif xPos >= 6 and xPos <= 9 then
-    -- iFlow = iFlow-10000
-    -- elseif xPos >= 10 and xPos <= 12 then
-    -- iFlow = iFlow-100000
-    -- elseif xPos >= 17 and xPos <= 19 then
-    -- iFlow = iFlow+100000
-    -- elseif xPos >= 21 and xPos <= 23 then
-    -- iFlow = iFlow+10000
-    -- elseif xPos >= 25 and xPos <= 27 then
-    -- iFlow = iFlow+1000
-    -- end
-    -- influx.setSignalLowFlow(iFlow)
-    -- save_config()
-    -- end
-
-    -- input gate toggle
-    if yPos == 10 and ( xPos == 14 or xPos == 15) then
-      if autoInputGate == 1 then
-        autoInputGate = 0
-      else
-        autoInputGate = 1
-      end
-      save_config()
-    end
+    event, side, xPos, yPos = os.pullEvent("monitor_touch")
   end
 end
 
 function drawButtons(y)
 
-  -- 2-4 = -1000, 6-9 = -10000, 10-12,8 = -100000
-  -- 17-19 = +1000, 21-23 = +10000, 25-27 = +100000
-
-    -- f.draw_text(mon, 2, y, " < ", colors.white, colors.gray)
-    -- f.draw_text(mon, 6, y, " <<", colors.white, colors.gray)
-    -- f.draw_text(mon, 10, y, "<<<", colors.white, colors.gray)
-
-    -- f.draw_text(mon, 17, y, ">>>", colors.white, colors.gray)
-    -- f.draw_text(mon, 21, y, ">> ", colors.white, colors.gray)
-    -- f.draw_text(mon, 25, y, " > ", colors.white, colors.gray)
-    -- end
+     end
 
 function pad(str, len, char)
     if char == nil then char = ' ' end
