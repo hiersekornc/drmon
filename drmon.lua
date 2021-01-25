@@ -262,5 +262,5 @@ mon.monitor,mon.X, mon.Y = monitor, monX, monY
 monitor.setBackgroundColor(colors.black)
 monitor.clear()
 
-parallel.waitForAll(update, buttons, wireless)
+parallel.waitForAll(update, wireless)
 
