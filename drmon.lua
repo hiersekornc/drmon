@@ -51,21 +51,6 @@ function load_config()
   sr.close()
 end
 
-function buttons()
-
-  while true do
-    load_config()
-    outflux.setSignalLowFlow(oFlow)
-    influx.setSignalLowFlow(iFlow)
-    -- button handler
-    event, side, xPos, yPos = os.pullEvent("monitor_touch")
-  end
-end
-
-function drawButtons(y)
-
-     end
-
 function pad(str, len, char)
     if char == nil then char = ' ' end
     return string.rep(char, len - #str) .. str
@@ -111,15 +96,8 @@ function update()
     if ri.temperature >= 5000 and ri.temperature <= 6500 then tempColor = colors.orange end
     f.draw_text_lr(mon, 2, 6, 1, "Temperature", pad(f.format_int(ri.temperature),13," ") .. " C", colors.white, tempColor, colors.black)
     f.draw_text_lr(mon, 2, 7, 1, "Output Gate", pad(f.format_int(outFlow),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
-    -- buttons
-    -- drawButtons(8)
     f.draw_text_lr(mon, 2, 9, 1, "Input Gate", pad(f.format_int(inFlow),11," ") .. " rf/t", colors.white, colors.blue, colors.black)
-    if autoInputGate == 1 then
-    -- f.draw_text(mon, 14, 10, "AU", colors.green, colors.gray)
-    else
-    -- f.draw_text(mon, 14, 10, "MA", colors.white, colors.gray)
-    -- drawButtons(10)
-    end
+
     local satPercent
     satPercent = math.ceil(ri.energySaturation / ri.maxEnergySaturation * 10000)*.01
     f.draw_text_lr(mon, 2, 11, 1, "Energy Saturation", pad(tostring(satPercent),8," ") .. "%", colors.white, colors.white, colors.black)
@@ -203,7 +181,7 @@ function update()
 end
 
 function patch()
-  local installURL = "https://raw.githubusercontent.com/hiersekornc/drmon/full-auto/install.lua"
+  local installURL = "https://raw.githubusercontent.com/Erani0/drmon/full-auto/install.lua"
   install = http.get(installURL)
   installFile = install.readAll()
   local file = fs.open("startup", "w")
