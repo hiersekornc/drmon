@@ -94,8 +94,8 @@ function update()
     local tempColor = colors.red
     if ri.temperature <= 5000 then tempColor = colors.green end
     if ri.temperature >= 5000 and ri.temperature <= 6500 then tempColor = colors.orange end
-    f.draw_text_lr(mon, 2, 6, 1, "Temperature", pad(f.format_int(ri.temperature),13," ") .. " C", colors.white, tempColor, colors.black)
-    f.draw_text_lr(mon, 2, 7, 1, "Output Gate", pad(f.format_int(outFlow),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
+    f.draw_text_lr(mon, 2, 5, 1, "Temperature", pad(f.format_int(ri.temperature),13," ") .. " C", colors.white, tempColor, colors.black)
+    f.draw_text_lr(mon, 2, 8, 1, "Output Gate", pad(f.format_int(outFlow),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
     f.draw_text_lr(mon, 2, 9, 1, "Input Gate", pad(f.format_int(inFlow),11," ") .. " rf/t", colors.white, colors.blue, colors.black)
 
     local satPercent
