@@ -1,8 +1,9 @@
 local reactorSide, igateName, ogateName, monName, oFlow, iFlow, mon, monitor, monX, monY, reactor, outflux, influx, ri, monType, modem, message
 
-local targetStrength = 50
+local targetStrength = 20
 local maxTemperature = 8000
 local safeTemperature = 3000
+local targetTemperature = 7900
 local lowestFieldPercent = 15
 
 local activateOnCharged = 1
@@ -148,8 +149,12 @@ function update()
         print(k.. ": ".. v)
       end
     end
-    print("Output Gate: ", outflux.getSignalLowFlow())
-    print("Input Gate: ", influx.getSignalLowFlow())
+    local outFlow
+    outFlow = outflux.getSignalLowFlow()
+    print("Output Gate: ", outFlow)
+    local inFlow
+    inFlow = influx.getSignalLowFlow()
+    print("Input Gate: ", inFlow)
     print("Last Message: ", message)
     -- monitor output
     local statusColor
@@ -167,10 +172,10 @@ function update()
     if ri.temperature <= 5000 then tempColor = colors.green end
     if ri.temperature >= 5000 and ri.temperature <= 6500 then tempColor = colors.orange end
     f.draw_text_lr(mon, 2, 6, 1, "Temperature", pad(f.format_int(ri.temperature),13," ") .. " C", colors.white, tempColor, colors.black)
-    f.draw_text_lr(mon, 2, 7, 1, "Output Gate", pad(f.format_int(outflux.getSignalLowFlow()),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
+    f.draw_text_lr(mon, 2, 7, 1, "Output Gate", pad(f.format_int(outFlow),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
     -- buttons
     drawButtons(8)
-    f.draw_text_lr(mon, 2, 9, 1, "Input Gate", pad(f.format_int(influx.getSignalLowFlow()),11," ") .. " rf/t", colors.white, colors.blue, colors.black)
+    f.draw_text_lr(mon, 2, 9, 1, "Input Gate", pad(f.format_int(inFlow),11," ") .. " rf/t", colors.white, colors.blue, colors.black)
     if autoInputGate == 1 then
       f.draw_text(mon, 14, 10, "AU", colors.green, colors.gray)
     else
@@ -224,9 +229,12 @@ function update()
     -- or set it to our saved setting since we are on manual
     if ri.status == "running" then
       if autoInputGate == 1 then 
-        fluxval = ri.fieldDrainRate / (1 - (targetStrength/100) )
-        print("Target Gate: ".. fluxval)
-        influx.setSignalLowFlow(fluxval)
+        autoInFlux = ri.fieldDrainRate / (1 - (targetStrength/100) )
+        autoOutFlux = ri.generationRate / (ri.temperature / targetTemperature)
+        print("Target Input Gate: ".. autoInFlux)
+        print("Target Output Gate: ".. autoOutFlux)
+        influx.setSignalLowFlow(autoInFlux)
+        outflux.setSignalLowFlow(autoOutFlux)
       else
         influx.setSignalLowFlow(iFlow)
       end
