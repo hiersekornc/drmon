@@ -1,4 +1,4 @@
-local reactorSide, igateName, ogateName, monName, oFlow, iFlow, mon, monitor, monX, monY, reactor, outflux, influx, eta, ri, monType, modem, message
+local reactorSide, igateName, ogateName, monName, oFlow, iFlow, mon, monitor, monX, monY, reactor, outflux, influx, ri, monType, modem, message
 
 local targetStrength = 25
 local maxTemperature = 7900
@@ -13,6 +13,8 @@ local identify = false
 os.loadAPI("lib/f")
 
 local version = "4.1"
+-- toggleable via the monitor, use our algorithm to achieve our target field strength or let the user tweak it
+local autoInputGate = 1
 
 -- last performed action
 local action = "None since reboot"
@@ -30,6 +32,7 @@ function save_config()
   sw.writeLine(monName)
   sw.writeLine(oFlow)
   sw.writeLine(iFlow)
+  sw.writeLine(autoInputGate)
   sw.close()
 end
 
@@ -44,6 +47,7 @@ function load_config()
   monName = sr.readLine()
   oFlow = tonumber(sr.readLine())
   iFlow = tonumber(sr.readLine())
+  autoInputGate = tonumber(sr.readLine())
   sr.close()
 end
 
@@ -88,13 +92,9 @@ function update()
     f.draw_text_lr(mon, 2, 2, 1, "Reactor Status", pad(string.upper(ri.status),12," "), colors.white, statusColor, colors.black)
     f.draw_text_lr(mon, 2, 4, 1, "Generation", pad(f.format_int(ri.generationRate), 10, " ") .. " rf/t", colors.white, colors.lime, colors.black)
     local tempColor = colors.red
-    if ri.temperature <= 5000 then tempColor = colors.gray end
-    if ri.temperature > 7000 and ri.temperature <= 8000 then tempColor = colors.green end
-    if ri.temperature > 8000 and ri.temperature <= 8100 then tempColor = colors.orange end
+    if ri.temperature <= 5000 then tempColor = colors.green end
+    if ri.temperature >= 5000 and ri.temperature <= 6500 then tempColor = colors.orange end
     f.draw_text_lr(mon, 2, 5, 1, "Temperature", pad(f.format_int(ri.temperature),13," ") .. " C", colors.white, tempColor, colors.black)
-    eta = ri.fuelConversionRate * ( ri.maxFuelConversion - ri.fuelConversion ) / 20
-    f.draw_text_lr(mon, 2, 6, 1, "ETA", pad(tostring(eta),11," ") .. "", colors.white, fuelColor, colors.black)
-
     f.draw_text_lr(mon, 2, 8, 1, "Output Gate", pad(f.format_int(outFlow),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
     f.draw_text_lr(mon, 2, 9, 1, "Input Gate", pad(f.format_int(inFlow),11," ") .. " rf/t", colors.white, colors.blue, colors.black)
 
@@ -107,7 +107,11 @@ function update()
     fieldColor = colors.red
     if fieldPercent >= 50 then fieldColor = colors.green end
     if fieldPercent < 50 and fieldPercent > 30 then fieldColor = colors.orange end
-    f.draw_text_lr(mon, 2, 14, 1, "Field Strength T:" .. targetStrength, fieldPercent .. "%", colors.white, fieldColor, colors.black)
+    if autoInputGate == 1 then 
+      f.draw_text_lr(mon, 2, 14, 1, "Field Strength T:" .. targetStrength, fieldPercent .. "%", colors.white, fieldColor, colors.black)
+    else
+      f.draw_text_lr(mon, 2, 14, 1, "Field Strength", pad(tostring(fieldPercent),6," ") .. "%", colors.white, fieldColor, colors.black)
+    end
     f.progress_bar(mon, 2, 15, mon.X-2, fieldPercent, 100, fieldColor, colors.gray)
 
     local fuelPercent, fuelColor
@@ -140,12 +144,16 @@ function update()
     -- are we on? regulate the input fludgate to our target field strength
     -- or set it to our saved setting since we are on manual
     if ri.status == "running" then
-      autoInFlux = ri.fieldDrainRate / (1 - (targetStrength/100) )
-      autoOutFlux = ri.generationRate / (ri.temperature / targetTemperature)
-      print("Target Input Gate: ".. autoInFlux)
-      print("Target Output Gate: ".. autoOutFlux)
-      influx.setSignalLowFlow(autoInFlux)
-      outflux.setSignalLowFlow(autoOutFlux)
+      if autoInputGate == 1 then 
+        autoInFlux = ri.fieldDrainRate / (1 - (targetStrength/100) )
+        autoOutFlux = ri.generationRate / (ri.temperature / targetTemperature)
+        print("Target Input Gate: ".. autoInFlux)
+        print("Target Output Gate: ".. autoOutFlux)
+        influx.setSignalLowFlow(autoInFlux)
+        outflux.setSignalLowFlow(autoOutFlux)
+      else
+        influx.setSignalLowFlow(iFlow)
+      end
       save_config()
     end
     -- safeguards
@@ -169,19 +177,6 @@ function update()
       emergencyTemp = true
     end
     sleep(0.1)
-  end
-end
-
-function SecondsToClock(seconds)
-  local seconds = tonumber(seconds)
-
-  if seconds <= 0 then
-    return "00:00:00";
-  else
-    hours = string.format("%02.f", math.floor(seconds/3600));
-    mins = string.format("%02.f", math.floor(seconds/60 - (hours*60)));
-    secs = string.format("%02.f", math.floor(seconds - hours*3600 - mins *60));
-    return hours..":"..mins..":"..secs
   end
 end
 
