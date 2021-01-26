@@ -92,9 +92,13 @@ function update()
     f.draw_text_lr(mon, 2, 2, 1, "Reactor Status", pad(string.upper(ri.status),12," "), colors.white, statusColor, colors.black)
     f.draw_text_lr(mon, 2, 4, 1, "Generation", pad(f.format_int(ri.generationRate), 10, " ") .. " rf/t", colors.white, colors.lime, colors.black)
     local tempColor = colors.red
-    if ri.temperature <= 5000 then tempColor = colors.green end
-    if ri.temperature >= 5000 and ri.temperature <= 6500 then tempColor = colors.orange end
+    if ri.temperature <= 5000 then tempColor = colors.gray end
+    if ri.temperature > 7000 and ri.temperature <= 8000 then tempColor = colors.green end
+    if ri.temperature > 8000 and ri.temperature <= 8100 then tempColor = colors.orange end
     f.draw_text_lr(mon, 2, 5, 1, "Temperature", pad(f.format_int(ri.temperature),13," ") .. " C", colors.white, tempColor, colors.black)
+    local eta
+    eta = reactorInfo.fuelConversionRate * ( ri.maxFuelConversion - ri.fuelConversion ) / 20
+    f.draw_text_lr(mon, 2, 6, 1, "ETA", pad(tostring(eta),11," ") .. "s", colors.white, fuelColor, colors.black)
     f.draw_text_lr(mon, 2, 8, 1, "Output Gate", pad(f.format_int(outFlow),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
     f.draw_text_lr(mon, 2, 9, 1, "Input Gate", pad(f.format_int(inFlow),11," ") .. " rf/t", colors.white, colors.blue, colors.black)
 
