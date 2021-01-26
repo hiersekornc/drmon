@@ -2,11 +2,11 @@
 --
 --
 
-local libURL = "https://raw.githubusercontent.com/hiersekornc/drmon/full-auto/lib/f.lua"
-local reactorURL = "https://raw.githubusercontent.com/hiersekornc/drmon/full-auto/drmon.lua"
-local batURL = "https://raw.githubusercontent.com/hiersekornc/drmon/full-auto/bat.lua"
+local libURL = "https://raw.githubusercontent.com/Erani0/drmon/full-auto/lib/f.lua"
+local reactorURL = "https://raw.githubusercontent.com/Erani0/drmon/full-auto/drmon.lua"
+local batURL = "https://raw.githubusercontent.com/Erani0/drmon/full-auto/bat.lua"
 local lib, reactor, bat, libFile, reactorFile, batFile, selected, monType, flowIn, FlowOut, rSide, monitor, first, second
-local version = "4.0"
+local version = "4.1"
 
 fs.makeDir("lib")
 
@@ -41,9 +41,8 @@ function save_config()
   sw.writeLine(flowIn)
   sw.writeLine(flowOut)
   sw.writeLine(monitor)
-  sw.writeLine("0")
+  sw.writeLine("10")
   sw.writeLine("900000")
-  sw.writeLine("1")
   sw.close()
 end
 

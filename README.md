@@ -57,7 +57,7 @@ I have not created a tutorial for 1.12.2 yet.
 * install this code via running the install script using these commands :
 
 ```
-> pastebin get mgF6RZFQ startup
+> pastebin get N0KBcH2N startup
 > startup
 
 > On Advanced ender pocket computer (Optional)
