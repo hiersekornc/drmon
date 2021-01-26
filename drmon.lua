@@ -119,7 +119,7 @@ function update()
     fuelColor = colors.red
     if fuelPercent >= 70 then fuelColor = colors.green end
     if fuelPercent < 70 and fuelPercent > 30 then fuelColor = colors.orange end
-    f.draw_text_lr(mon, 2, 17, 1, "Fuel ", pad(tostring(fuelPercent),10," ") .. "%", colors.white, fuelColor, colo
+    f.draw_text_lr(mon, 2, 17, 1, "Fuel ", pad(tostring(fuelPercent),10," ") .. "%", colors.white, fuelColor, colors.black)
     f.progress_bar(mon, 2, 18, mon.X-2, fuelPercent, 100, fuelColor, colors.gray)
     f.draw_text_lr(mon, 2, 19, 1, "Action ", pad(action,20," "), colors.gray, colors.gray, colors.black)
     -- actual reactor interaction
