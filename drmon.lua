@@ -1,10 +1,10 @@
 local reactorSide, igateName, ogateName, monName, oFlow, iFlow, mon, monitor, monX, monY, reactor, outflux, influx, ri, monType, modem, message
 
-local targetStrength = 25
-local maxTemperature = 7900
+local targetStrength = 15
+local maxTemperature = 9000
 local safeTemperature = 3000
-local targetTemperature = 7000
-local lowestFieldPercent = 15
+local targetTemperature = 8000
+local lowestFieldPercent = 10
 
 local activateOnCharged = 1
 local identify = false
