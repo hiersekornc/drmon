@@ -207,6 +207,9 @@ function update()
     f.draw_text_lr(mon, 2, 16, 1, "Fuel ", pad(tostring(fuelPercent),10," ") .. "%", colors.white, fuelColor, colors.black)
     local eta
     eta = ( ri.maxFuelConversion - ri.fuelConversion ) / ri.fuelConversionRate / 20
+    print("maxFuelConversion: ", ri.maxFuelConversion)
+    print("fuelConversion: ", ri.fuelConversion)
+    print("fuelConversionRate: ", ri.fuelConversionRate)
     f.draw_text_lr(mon, 2, 17, 1, "ETA ", pad(secondsToClock(eta),11," "), colors.white, fuelColor, colors.black)
     f.progress_bar(mon, 2, 18, mon.X-2, fuelPercent, 100, fuelColor, colors.gray)
     f.draw_text_lr(mon, 2, 19, 1, "Action ", pad(action,20," "), colors.gray, colors.gray, colors.black)
