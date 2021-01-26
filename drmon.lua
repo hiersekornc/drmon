@@ -89,8 +89,9 @@ function update()
     f.draw_text_lr(mon, 2, 4, 1, "Generation", pad(f.format_int(ri.generationRate), 10, " ") .. " rf/t", colors.white, colors.lime, colors.black)
     local tempColor = colors.red
     if ri.temperature <= 5000 then tempColor = colors.gray end
-    if ri.temperature > 7000 and ri.temperature <= 8000 then tempColor = colors.green end
-    if ri.temperature > 8000 and ri.temperature <= 8100 then tempColor = colors.orange end
+    if ri.temperature > 5000 and ri.temperature <= 6500 then tempColor = colors.lime end
+    if ri.temperature > 6500 and ri.temperature <= 7900 then tempColor = colors.green end
+    if ri.temperature > 7900 and ri.temperature <= 8100 then tempColor = colors.orange end
     f.draw_text_lr(mon, 2, 5, 1, "Temperature", pad(f.format_int(ri.temperature),13," ") .. " C", colors.white, tempColor, colors.black)
     local eta, ets
 	ets = ri.maxFuelConversion - ri.fuelConversion
