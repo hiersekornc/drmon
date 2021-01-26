@@ -1,4 +1,4 @@
-local reactorSide, igateName, ogateName, monName, oFlow, iFlow, mon, monitor, monX, monY, reactor, outflux, influx, ri, monType, modem, message
+local reactorSide, igateName, ogateName, monName, mon, monitor, monX, monY, reactor, outflux, influx, ri, monType, modem, message
 
 local targetStrength = 15
 local maxTemperature = 9000
@@ -28,8 +28,6 @@ function save_config()
   sw.writeLine(igateName)
   sw.writeLine(ogateName)
   sw.writeLine(monName)
-  sw.writeLine(oFlow)
-  sw.writeLine(iFlow)
   sw.close()
 end
 
@@ -42,8 +40,6 @@ function load_config()
   igateName = sr.readLine()
   ogateName = sr.readLine()
   monName = sr.readLine()
-  oFlow = tonumber(sr.readLine())
-  iFlow = tonumber(sr.readLine())
   sr.close()
 end
 
@@ -149,7 +145,6 @@ function update()
       print("Target Output Gate: ".. autoOutFlux)
       influx.setSignalLowFlow(autoInFlux)
       outflux.setSignalLowFlow(autoOutFlux)
-      save_config()
     end
     -- safeguards
     --
@@ -260,9 +255,6 @@ monitor = peripheral.wrap(monName)
 influx = peripheral.wrap(igateName)
 outflux = peripheral.wrap(ogateName)
 reactor = peripheral.wrap(reactorSide)
-
-influx.setSignalLowFlow(iFlow)
-outflux.setSignalLowFlow(oFlow)
 
 monX, monY = monitor.getSize()
 mon = {}
