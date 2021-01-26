@@ -61,7 +61,7 @@ I have not created a tutorial for 1.12.2 yet.
 > startup
 
 > On Advanced ender pocket computer (Optional)
-> pastebin get PUWxdYWY startup
+> pastebin get GEe4r7z8 startup
 > startup
 ```
 * you should see stats in your term, and on your monitor
