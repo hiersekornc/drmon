@@ -93,24 +93,25 @@ function update()
     if ri.temperature > 6500 and ri.temperature <= 7900 then tempColor = colors.lime end
     if ri.temperature > 7900 and ri.temperature <= 8100 then tempColor = colors.orange end
     f.draw_text_lr(mon, 2, 5, 1, "Temperature", pad(f.format_int(ri.temperature),13," ") .. " C", colors.white, tempColor, colors.black)
-    local eta, ets
-	ets = ri.maxFuelConversion - ri.fuelConversion
-    eta = ri.fuelConversionRate * ets / 20
-	print("ETA: ", round2(eta))
-    f.draw_text_lr(mon, 2, 6, 1, "ETA", pad(tostring(round2(eta)),11," ") .. "", colors.white, colors.blue, colors.black)
+ 
+    local eta
+    eta = ( ri.maxFuelConversion - ri.fuelConversion ) / ( ri.fuelConversionRate / 1000000 * 20 )
+    f.draw_text_lr(mon, 2, 6, 1, "ETA ", pad(secondsToClock(eta),11," "), colors.white, colors.blue, colors.black)
     f.draw_text_lr(mon, 2, 8, 1, "Output Gate", pad(f.format_int(outFlow),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
     f.draw_text_lr(mon, 2, 9, 1, "Input Gate", pad(f.format_int(inFlow),11," ") .. " rf/t", colors.white, colors.blue, colors.black)
 
-    local satPercent
-    satPercent = math.ceil(ri.energySaturation / ri.maxEnergySaturation * 10000)*.01
-    f.draw_text_lr(mon, 2, 11, 1, "Energy Saturation", pad(tostring(satPercent),8," ") .. "%", colors.white, colors.white, colors.black)
-    f.progress_bar(mon, 2, 12, mon.X-2, satPercent, 100, colors.blue, colors.gray)
+    -- local satPercent
+    -- satPercent = math.ceil(ri.energySaturation / ri.maxEnergySaturation * 10000)*.01
+    -- f.draw_text_lr(mon, 2, 11, 1, "Energy Saturation", pad(tostring(satPercent),8," ") .. "%", colors.white, colors.white, colors.black)
+    -- f.progress_bar(mon, 2, 12, mon.X-2, satPercent, 100, colors.blue, colors.gray)
+
     local fieldPercent, fieldColor
     fieldPercent = math.ceil(ri.fieldStrength / ri.maxFieldStrength * 10000)*.01
     fieldColor = colors.red
     if fieldPercent >= 50 then fieldColor = colors.green end
     if fieldPercent < 50 and fieldPercent > 30 then fieldColor = colors.orange end
-    f.draw_text_lr(mon, 2, 14, 1, "Field Strength T:" .. targetStrength, fieldPercent .. "%", colors.white, fieldColor, colors.black)
+
+    f.draw_text_lr(mon, 2, 14, 1, "Field Strength T:" .. targetStrength, pad(tostring(fieldPercent),6," ") .. "%", colors.white, fieldColor, colors.black)
     f.progress_bar(mon, 2, 15, mon.X-2, fieldPercent, 100, fieldColor, colors.gray)
 
     local fuelPercent, fuelColor
@@ -118,7 +119,7 @@ function update()
     fuelColor = colors.red
     if fuelPercent >= 70 then fuelColor = colors.green end
     if fuelPercent < 70 and fuelPercent > 30 then fuelColor = colors.orange end
-    f.draw_text_lr(mon, 2, 17, 1, "Fuel ", pad(tostring(fuelPercent),10," ") .. "%", colors.white, fuelColor, colors.black)
+    f.draw_text_lr(mon, 2, 17, 1, "Fuel ", pad(tostring(fuelPercent),10," ") .. "%", colors.white, fuelColor, colo
     f.progress_bar(mon, 2, 18, mon.X-2, fuelPercent, 100, fuelColor, colors.gray)
     f.draw_text_lr(mon, 2, 19, 1, "Action ", pad(action,20," "), colors.gray, colors.gray, colors.black)
     -- actual reactor interaction
@@ -143,13 +144,13 @@ function update()
     -- are we on? regulate the input fludgate to our target field strength
     -- or set it to our saved setting since we are on manual
     if ri.status == "running" then
-		autoInFlux = ri.fieldDrainRate / (1 - (targetStrength/100) )
-		autoOutFlux = ri.generationRate / (ri.temperature / targetTemperature)
-		print("Target Input Gate: ".. autoInFlux)
-		print("Target Output Gate: ".. autoOutFlux)
-		influx.setSignalLowFlow(autoInFlux)
-		outflux.setSignalLowFlow(autoOutFlux)
-		save_config()
+		  autoInFlux = ri.fieldDrainRate / (1 - (targetStrength/100) )
+      autoOutFlux = ( math.max( 10, ri.generationRate ) / ( ri.temperature / targetTemperature ) )
+		  print("Target Input Gate: ".. autoInFlux)
+	  	print("Target Output Gate: ".. autoOutFlux)
+		  influx.setSignalLowFlow(autoInFlux)
+	  	outflux.setSignalLowFlow(autoOutFlux)
+		  save_config()
     end
     -- safeguards
     --
@@ -174,42 +175,27 @@ function update()
     sleep(0.1)
   end
 end
-	function round2(num)
-		return SecondsToClock(tonumber(string.format("%." .. 0 .. "f", num)))
-	end
-	function SecondsToClock(time)
-	  local time = tonumber(time)
-
-	  if time <= 0 then
-		return "00:00:00";
-	  else
-		  local days = math.floor(time/86400)
-		  local remaining = time % 86400
-		  local hours = math.floor(remaining/3600)
-		  remaining = remaining % 3600
-		  local minutes = math.floor(remaining/60)
-		  remaining = remaining % 60
-		  local seconds = remaining
-		  if (hours < 10) then
-			hours = "0" .. tostring(hours)
-		  end
-		  if (minutes < 10) then
-			minutes = "0" .. tostring(minutes)
-		  end
-		  if (seconds < 10) then
-			seconds = "0" .. tostring(seconds)
-		  end
-		return days.."d "..hours..":"..minutes..":"..seconds
-	  end
-	end
-
+	
 function patch()
-  local installURL = "https://raw.githubusercontent.com/Erani0/drmon/full-auto/install.lua"
+  local installURL = "https://raw.githubusercontent.com/hiersekornc/drmon/full-auto/install.lua"
   install = http.get(installURL)
   installFile = install.readAll()
   local file = fs.open("startup", "w")
   file.write(installFile)
   file.close()
+end
+
+function secondsToClock(seconds)
+  local seconds = tonumber(seconds)
+
+  if seconds <= 0 then
+    return "00h00m00s";
+  else
+    hours = string.format("%02.f", math.floor(seconds/3600));
+    mins = string.format("%02.f", math.floor(seconds/60 - (hours*60)));
+    secs = string.format("%02.f", math.floor(seconds - hours*3600 - mins *60));
+    return hours.."h"..mins.."m"..secs.."s"
+  end
 end
 
 function wireless()
