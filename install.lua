@@ -41,9 +41,8 @@ function save_config()
   sw.writeLine(flowIn)
   sw.writeLine(flowOut)
   sw.writeLine(monitor)
-  sw.writeLine("0")
+  sw.writeLine("10")
   sw.writeLine("900000")
-  sw.writeLine("1")
   sw.close()
 end
 
