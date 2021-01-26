@@ -141,16 +141,15 @@ function update()
     if ri.status == "warming_up" and activateOnCharged == 1 then
       reactor.activateReactor()
     end
-    -- are we on? regulate the input fludgate to our target field strength
-    -- or set it to our saved setting since we are on manual
+    -- are we on? regulate the input fluxgate to our target field strength and the output fluxgate to our target temperature
     if ri.status == "running" then
-		  autoInFlux = ri.fieldDrainRate / (1 - (targetStrength/100) )
+      autoInFlux = ri.fieldDrainRate / (1 - (targetStrength/100) )
       autoOutFlux = ( math.max( 10, ri.generationRate ) / ( ri.temperature / targetTemperature ) )
-		  print("Target Input Gate: ".. autoInFlux)
-	  	print("Target Output Gate: ".. autoOutFlux)
-		  influx.setSignalLowFlow(autoInFlux)
-	  	outflux.setSignalLowFlow(autoOutFlux)
-		  save_config()
+      print("Target Input Gate: ".. autoInFlux)
+      print("Target Output Gate: ".. autoOutFlux)
+      influx.setSignalLowFlow(autoInFlux)
+      outflux.setSignalLowFlow(autoOutFlux)
+      save_config()
     end
     -- safeguards
     --
