@@ -96,9 +96,11 @@ function update()
     if ri.temperature > 7000 and ri.temperature <= 8000 then tempColor = colors.green end
     if ri.temperature > 8000 and ri.temperature <= 8100 then tempColor = colors.orange end
     f.draw_text_lr(mon, 2, 5, 1, "Temperature", pad(f.format_int(ri.temperature),13," ") .. " C", colors.white, tempColor, colors.black)
-    local eta
-    eta = ri.fuelConversionRate * ( ri.maxFuelConversion - ri.fuelConversion ) / 20
-    f.draw_text_lr(mon, 2, 6, 1, "ETA ", pad(tostring(eta),11," ") .. "s", colors.white, fuelColor, colors.black)
+    local eta, ets
+	ets = ri.maxFuelConversion - ri.fuelConversion
+    eta = ri.fuelConversionRate * ets / 20
+	print("ETA: ", round2(eta))
+    f.draw_text_lr(mon, 2, 6, 1, "ETA", pad(tostring(round2(eta)),11," ") .. "", colors.white, colors.blue, colors.black)
     f.draw_text_lr(mon, 2, 8, 1, "Output Gate", pad(f.format_int(outFlow),10," ") .. " rf/t", colors.white, colors.blue, colors.black)
     f.draw_text_lr(mon, 2, 9, 1, "Input Gate", pad(f.format_int(inFlow),11," ") .. " rf/t", colors.white, colors.blue, colors.black)
 
@@ -183,6 +185,34 @@ function update()
     sleep(0.1)
   end
 end
+	function round2(num)
+		return SecondsToClock(tonumber(string.format("%." .. 0 .. "f", num)))
+	end
+	function SecondsToClock(time)
+	  local time = tonumber(time)
+
+	  if time <= 0 then
+		return "00:00:00";
+	  else
+		  local days = math.floor(time/86400)
+		  local remaining = time % 86400
+		  local hours = math.floor(remaining/3600)
+		  remaining = remaining % 3600
+		  local minutes = math.floor(remaining/60)
+		  remaining = remaining % 60
+		  local seconds = remaining
+		  if (hours < 10) then
+			hours = "0" .. tostring(hours)
+		  end
+		  if (minutes < 10) then
+			minutes = "0" .. tostring(minutes)
+		  end
+		  if (seconds < 10) then
+			seconds = "0" .. tostring(seconds)
+		  end
+		return days.."d "..hours..":"..minutes..":"..seconds
+	  end
+	end
 
 function patch()
   local installURL = "https://raw.githubusercontent.com/Erani0/drmon/full-auto/install.lua"
