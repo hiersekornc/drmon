@@ -206,8 +206,8 @@ function update()
     if fuelPercent < 70 and fuelPercent > 30 then fuelColor = colors.orange end
     f.draw_text_lr(mon, 2, 16, 1, "Fuel ", pad(tostring(fuelPercent),10," ") .. "%", colors.white, fuelColor, colors.black)
     local eta
-    eta = ri.fuelConversionRate * ( ri.maxFuelConversion - ri.fuelConversion ) / 20
-    f.draw_text_lr(mon, 2, 17, 1, "ETA ", pad(tostring(eta),11," ") .. "s", colors.white, fuelColor, colors.black)
+    etaSecs = ri.fuelConversionRate * ( ri.maxFuelConversion - ri.fuelConversion ) / 20
+    f.draw_text_lr(mon, 2, 17, 1, "ETA ", pad(secondsToClock(eta),11," "), colors.white, fuelColor, colors.black)
     f.progress_bar(mon, 2, 18, mon.X-2, fuelPercent, 100, fuelColor, colors.gray)
     f.draw_text_lr(mon, 2, 19, 1, "Action ", pad(action,20," "), colors.gray, colors.gray, colors.black)
     -- actual reactor interaction
@@ -275,6 +275,19 @@ function patch()
   local file = fs.open("startup", "w")
   file.write(installFile)
   file.close()
+end
+
+function secondsToClock(seconds)
+  local seconds = tonumber(seconds)
+
+  if seconds <= 0 then
+    return "00h00m00s";
+  else
+    hours = string.format("%02.f", math.floor(seconds/3600));
+    mins = string.format("%02.f", math.floor(seconds/60 - (hours*60)));
+    secs = string.format("%02.f", math.floor(seconds - hours*3600 - mins *60));
+    return hours.."h"..mins.."m"..secs.."s"
+  end
 end
 
 function wireless()
