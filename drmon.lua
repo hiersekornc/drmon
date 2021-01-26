@@ -13,8 +13,6 @@ local identify = false
 os.loadAPI("lib/f")
 
 local version = "4.1"
--- toggleable via the monitor, use our algorithm to achieve our target field strength or let the user tweak it
-local autoInputGate = 1
 
 -- last performed action
 local action = "None since reboot"
@@ -32,7 +30,6 @@ function save_config()
   sw.writeLine(monName)
   sw.writeLine(oFlow)
   sw.writeLine(iFlow)
-  sw.writeLine(autoInputGate)
   sw.close()
 end
 
@@ -47,7 +44,6 @@ function load_config()
   monName = sr.readLine()
   oFlow = tonumber(sr.readLine())
   iFlow = tonumber(sr.readLine())
-  autoInputGate = tonumber(sr.readLine())
   sr.close()
 end
 
@@ -113,11 +109,7 @@ function update()
     fieldColor = colors.red
     if fieldPercent >= 50 then fieldColor = colors.green end
     if fieldPercent < 50 and fieldPercent > 30 then fieldColor = colors.orange end
-    if autoInputGate == 1 then 
-      f.draw_text_lr(mon, 2, 14, 1, "Field Strength T:" .. targetStrength, fieldPercent .. "%", colors.white, fieldColor, colors.black)
-    else
-      f.draw_text_lr(mon, 2, 14, 1, "Field Strength", pad(tostring(fieldPercent),6," ") .. "%", colors.white, fieldColor, colors.black)
-    end
+    f.draw_text_lr(mon, 2, 14, 1, "Field Strength T:" .. targetStrength, fieldPercent .. "%", colors.white, fieldColor, colors.black)
     f.progress_bar(mon, 2, 15, mon.X-2, fieldPercent, 100, fieldColor, colors.gray)
 
     local fuelPercent, fuelColor
@@ -150,17 +142,13 @@ function update()
     -- are we on? regulate the input fludgate to our target field strength
     -- or set it to our saved setting since we are on manual
     if ri.status == "running" then
-      if autoInputGate == 1 then 
-        autoInFlux = ri.fieldDrainRate / (1 - (targetStrength/100) )
-        autoOutFlux = ri.generationRate / (ri.temperature / targetTemperature)
-        print("Target Input Gate: ".. autoInFlux)
-        print("Target Output Gate: ".. autoOutFlux)
-        influx.setSignalLowFlow(autoInFlux)
-        outflux.setSignalLowFlow(autoOutFlux)
-      else
-        influx.setSignalLowFlow(iFlow)
-      end
-      save_config()
+		autoInFlux = ri.fieldDrainRate / (1 - (targetStrength/100) )
+		autoOutFlux = ri.generationRate / (ri.temperature / targetTemperature)
+		print("Target Input Gate: ".. autoInFlux)
+		print("Target Output Gate: ".. autoOutFlux)
+		influx.setSignalLowFlow(autoInFlux)
+		outflux.setSignalLowFlow(autoOutFlux)
+		save_config()
     end
     -- safeguards
     --
