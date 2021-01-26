@@ -1,4 +1,4 @@
-local pocketUrl = "https://raw.githubusercontent.com/hiersekornc/drmon/master/pocket.lua"
+local pocketUrl = "https://raw.githubusercontent.com/hiersekornc/drmon/full-auto/pocket.lua"
 
 pocket = http.get(pocketUrl)
 pocketFile = pocket.readAll()
